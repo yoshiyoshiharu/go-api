@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER NOT NULL auto_increment PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  frist_name VARCHAR(255) NOT NULL,
+  last_name VARCHAR(255) NOT NULL
+)
