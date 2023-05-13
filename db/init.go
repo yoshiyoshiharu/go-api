@@ -7,8 +7,11 @@ import(
 	"time"
 )
 
-func Init() *sql.DB {
-	jst, err := time.LoadLocation("Asia/Tokyo")
+var Db *sql.DB
+
+func init() {
+	var err
+	jst, err = time.LoadLocation("Asia/Tokyo")
 	if err != nil {
 	  log.Fatal(err)
 	}
@@ -24,15 +27,14 @@ func Init() *sql.DB {
 		Loc:       jst,
 		AllowNativePasswords: true,
 	}
-	db, err := sql.Open("mysql", c.FormatDSN())
+	Db, err = sql.Open("mysql", c.FormatDSN())
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = db.Ping(); err != nil {
+	if err = Db.Ping(); err != nil {
 		log.Fatal(err)
 	} else {
 		log.Println("Successfly connected to database.")
 	}
-	return db
 }
