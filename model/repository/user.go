@@ -2,6 +2,7 @@ package repository
 
 import(
 	"github.com/yoshiyoshiharu/go-api-server/model/entity"
+	"log"
 )
 
 type UserRepository interface {
@@ -21,7 +22,26 @@ func NewUserRepository() UserRepository {
 }
 
 func (r *userRepository) GetUsers() ([]entity.UserEntity, error) {
-	return nil, nil
+	users := []entity.UserEntity{}
+
+	rows, err := Db.Query("SELECT * FROM users")
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
+
+	for rows.Next() {
+		user := entity.UserEntity{}
+		err := rows.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName)
+		if err != nil {
+			log.Print(err)
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 func (r *userRepository) GetUserByID(id string) (entity.UserEntity, error) {
