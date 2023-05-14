@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/yoshiyoshiharu/go-api-server/model/entity"
 	"github.com/yoshiyoshiharu/go-api-server/model/repository"
 )
 
@@ -12,7 +14,7 @@ func main() {
 
 	router.GET("/users", getUsers)
 	router.GET("/users/:id", getUserByID)
-	// router.POST("/users", postUsers)
+	router.POST("/users", postUsers)
 
 	router.Run(":8080")
 }
@@ -29,6 +31,7 @@ func getUsers(c *gin.Context) {
 func getUserByID(c *gin.Context) {
 	id := c.Param("id")
 	user, err := repository.NewUserRepository().GetUserByID(id)
+
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "user not found"})
 	} else {
@@ -36,13 +39,14 @@ func getUserByID(c *gin.Context) {
 	}
 }
 
-// func postUsers(c *gin.Context) {
-// 	var newUser user
+func postUsers(c *gin.Context) {
+	var newUser entity.UserEntity
 
-// 	if err := c.BindJSON(&newUser); err != nil {
-// 		return
-// 	}
+	if err := c.BindJSON(&newUser); err != nil {
+		fmt.Print(err)
+		return
+	}
+	repository.NewUserRepository().CreateUser(newUser)
 
-// 	users = append(users, newUser)
-// 	c.IndentedJSON(http.StatusCreated, newUser)
-// }
+	c.IndentedJSON(http.StatusCreated, newUser)
+}

@@ -68,7 +68,13 @@ func (r *userRepository) GetUserByID(id string) (entity.UserEntity, error) {
 }
 
 func (r *userRepository) CreateUser(user entity.UserEntity) (entity.UserEntity, error) {
-	return entity.UserEntity{}, nil
+	_, err := Db.Exec("INSERT INTO users (email, first_name, last_name) VALUES (?, ?, ?)", user.Email, user.FirstName, user.LastName)
+	if err != nil {
+		log.Print(err)
+		return entity.UserEntity{}, err
+	}
+
+	return user, nil
 }
 
 func (r *userRepository) UpdateUser(user entity.UserEntity) (entity.UserEntity, error) {
