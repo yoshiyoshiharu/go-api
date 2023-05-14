@@ -15,6 +15,8 @@ func main() {
 	router.GET("/users", getUsers)
 	router.GET("/users/:id", getUserByID)
 	router.POST("/users", postUsers)
+	router.PUT("/users/:id", updateUser)
+	router.PATCH("/users/:id", updateUser)
 
 	router.Run(":8080")
 }
@@ -49,4 +51,19 @@ func postUsers(c *gin.Context) {
 	repository.NewUserRepository().CreateUser(newUser)
 
 	c.IndentedJSON(http.StatusCreated, newUser)
+}
+
+func updateUser(c *gin.Context) {
+	id := c.Param("id")
+	user, err := repository.NewUserRepository().GetUserByID(id)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "user not found"})
+	}
+
+	if err := c.BindJSON(&user); err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	repository.NewUserRepository().UpdateUser(user)
 }
