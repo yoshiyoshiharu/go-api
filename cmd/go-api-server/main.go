@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	// "github.com/yoshiyoshiharu/go-api-server/db"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/yoshiyoshiharu/go-api-server/model/repository"
 )
 
 func main() {
@@ -26,11 +27,11 @@ type user struct {
 var users []user
 
 func getUsers(c *gin.Context) {
-	users = []user{
-		{ID: "1", Email: "test1@test.com", FirstName: "Test1", LastName: "User1"},
-		{ID: "2", Email: "test2@test.com", FirstName: "Test2", LastName: "User2"},
-		{ID: "3", Email: "test3@test.com", FirstName: "Test3", LastName: "User3"},
+	users, err := repository.NewUserRepository().GetUsers()
+	if err != nil {
+		return
 	}
+
 	c.IndentedJSON(http.StatusOK, users)
 }
 
