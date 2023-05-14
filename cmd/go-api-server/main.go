@@ -17,6 +17,7 @@ func main() {
 	router.POST("/users", postUsers)
 	router.PUT("/users/:id", updateUser)
 	router.PATCH("/users/:id", updateUser)
+	router.DELETE("/users/:id", deleteUser)
 
 	router.Run(":8080")
 }
@@ -66,4 +67,20 @@ func updateUser(c *gin.Context) {
 	}
 
 	repository.NewUserRepository().UpdateUser(user)
+}
+
+func deleteUser(c *gin.Context) {
+	id := c.Param("id")
+	_, err := repository.NewUserRepository().GetUserByID(id)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "user not found"})
+	}
+
+	err = repository.NewUserRepository().DeleteUser(id)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	c.IndentedJSON(http.StatusNoContent, gin.H{"message": "user deleted"})
 }

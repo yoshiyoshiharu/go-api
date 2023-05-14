@@ -88,5 +88,11 @@ func (r *userRepository) UpdateUser(user entity.UserEntity) (entity.UserEntity, 
 }
 
 func (r *userRepository) DeleteUser(id string) error {
+	_, err := Db.Exec("DELETE FROM users WHERE id = ?", id)
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+
 	return nil
 }
