@@ -1,8 +1,12 @@
 package repository
 
-import(
-	"github.com/yoshiyoshiharu/go-api-server/model/entity"
+import (
+	"fmt"
 	"log"
+	"errors"
+	"database/sql"
+
+	"github.com/yoshiyoshiharu/go-api-server/model/entity"
 )
 
 type UserRepository interface {
@@ -32,7 +36,7 @@ func (r *userRepository) GetUsers() ([]entity.UserEntity, error) {
 
 	for rows.Next() {
 		user := entity.UserEntity{}
-		err := rows.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName)
+		err = rows.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName)
 		if err != nil {
 			log.Print(err)
 			return nil, err
@@ -45,7 +49,22 @@ func (r *userRepository) GetUsers() ([]entity.UserEntity, error) {
 }
 
 func (r *userRepository) GetUserByID(id string) (entity.UserEntity, error) {
-	return entity.UserEntity{}, nil
+	user := entity.UserEntity{}
+
+  row := Db.QueryRow("SELECT * FROM users WHERE id = ?", id)
+
+	err := row.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			fmt.Println("User not found")
+			return entity.UserEntity{}, err
+		} else {
+			log.Print(err)
+			return entity.UserEntity{}, err
+		}
+	}
+
+	return user, nil
 }
 
 func (r *userRepository) CreateUser(user entity.UserEntity) (entity.UserEntity, error) {
